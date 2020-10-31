@@ -1,3 +1,28 @@
+const fs = require('fs');
+const dotenv = require('dotenv');
+const dotenvExpand = require('dotenv-expand');
+const { paths } = require('./utils');
+
+const { NODE_ENV } = process.env;
+if (!NODE_ENV) {
+  throw new Error(
+    '`NODE_ENV` environment variable was missing. Please specify it before running.',
+  );
+}
+
+// using .env.[NODE_ENV] file instead when not in `production` environment
+let envFile = `${paths.config}/.env`;
+if (NODE_ENV !== 'production') {
+  envFile = `${envFile}.${NODE_ENV}`;
+}
+
+// expand existing environment variables with targeted .env file
+let parsed;
+if (fs.existsSync(envFile)) {
+  const result = dotenvExpand(dotenv.config({ path: envFile }));
+  parsed = result.parsed;
+}
+
 function getEnv() {
   // return empty object instead when none was parsed
   if (!parsed) {
@@ -16,5 +41,6 @@ function getEnv() {
 
 // export env related
 module.exports = {
+  envFile,
   getEnv,
 };
