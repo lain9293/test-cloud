@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const hpp = require('hpp');
 const mongoose = require('mongoose');
 const { httpLogger, errorHandler, notFoundHandler } = require('./middleware');
+const { files, auth } = require('./routers');
 const { isDev, paths } = require('../utils');
 
 const app = express();
@@ -18,6 +19,9 @@ app.use(cookieParser());
 app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }), hpp());
+
+app.use('/api/files', files);
+app.use('/api/auth', auth);
 
 if (!isDev) {
   app.use('/build', express.static(`${paths.public}/build`));
