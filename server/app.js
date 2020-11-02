@@ -11,7 +11,10 @@ const { isDev, paths } = require('../utils');
 
 const app = express();
 
-mongoose.connect(`mongodb://${process.env.MONGODB_URL}/my-own-cloud`);
+mongoose.connect(`mongodb://${process.env.MONGODB_URL}/my-own-cloud`, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 app.use(helmet());
 app.use(httpLogger());
@@ -23,6 +26,7 @@ app.use(express.urlencoded({ extended: true }), hpp());
 app.use('/api/files', files);
 app.use('/api/auth', auth);
 
+// serve files in production environment
 if (!isDev) {
   app.use('/build', express.static(`${paths.public}/build`));
   app.get('*', (req, res) => {
